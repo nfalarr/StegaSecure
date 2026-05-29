@@ -2,6 +2,8 @@
 
 Aplikasi web statis untuk menyembunyikan pesan pada gambar menggunakan metode LSB dan AES.
 
+🌐 **Demo Aplikasi:** https://stegasecure.netlify.app
+
 ## Fitur
 
 * Enkripsi pesan dengan AES sebelum disisipkan ke gambar.
