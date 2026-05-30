@@ -789,6 +789,26 @@ button,
   height: 2rem;
 }
 
+.preview-image-wrapper .delete-preview-btn {
+  width: 2.5rem;
+  min-width: 2.5rem;
+  max-width: 2.5rem;
+  height: 2.5rem;
+  min-height: 2.5rem;
+  max-height: 2.5rem;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  padding: 0;
+  line-height: 1;
+  flex: 0 0 2.5rem;
+}
+
+.preview-image-wrapper .delete-preview-btn svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
+}
+
 @media (max-width: 768px) {
   .mb-10 {
     margin-bottom: 1.5rem;
