@@ -1,1 +1,0 @@
-# Tidak diperlukan dependensi Python untuk aplikasi static HTML/CSS/JS
