@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="static/css/style.css">
   </head>
   <body>
-    <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white p-6">
+    <main class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white p-6">
       <div class="max-w-6xl mx-auto">
         <div class="text-center mb-10 fade-in">
           <h1 class="text-5xl font-bold mb-4 gradient-text shimmer-text">StegaSecure</h1>
@@ -41,7 +41,7 @@
 
               <div id="encodePreview" class="hidden image-preview">
                 <div id="encodePreviewPlaceholder" class="preview-placeholder">
-                  <p class="text-slate-400">📷 Masukkan gambar terlebih dahulu!</p>
+                  <p class="text-slate-400">Masukkan gambar terlebih dahulu.</p>
                 </div>
                 <div class="preview-image-wrapper">
                   <img id="encodePreviewImg" src="" alt="" class="w-full rounded-xl hidden" />
@@ -78,7 +78,7 @@
                 onclick="encodeMessage()"
                 class="btn btn-primary w-full"
               >
-                Encode & Download Image
+                Encode & Download
               </button>
 
               <canvas id="encodeCanvas" class="hidden"></canvas>
@@ -105,7 +105,7 @@
 
               <div id="decodePreview" class="hidden image-preview">
                 <div id="decodePreviewPlaceholder" class="preview-placeholder">
-                  <p class="text-slate-400">📷 Masukkan gambar terlebih dahulu!</p>
+                  <p class="text-slate-400">Masukkan gambar terlebih dahulu.</p>
                 </div>
                 <div class="preview-image-wrapper">
                   <img id="decodePreviewImg" src="" alt="" class="w-full rounded-xl hidden" />
@@ -132,7 +132,7 @@
                 onclick="decodeMessage()"
                 class="btn btn-primary w-full"
               >
-                Decode Message
+                Decode Pesan
               </button>
 
               <div class="mt-6">
@@ -177,8 +177,8 @@
         </div>
       </div>
 
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-      <script src="static/js/app.js"></script>
-    </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="static/js/app.js"></script>
   </body>
 </html>

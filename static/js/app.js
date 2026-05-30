@@ -17,6 +17,74 @@ function binaryToText(binary) {
   return text;
 }
 
+function imageDataToFile(dataUrl, fileName) {
+  const parts = dataUrl.split(",");
+  const mimeMatch = parts[0].match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : "image/png";
+  const binary = atob(parts[1]);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  return new File([bytes], fileName, { type: mime });
+}
+
+function assignInputFile(input, file) {
+  if (!input || !file) return;
+
+  try {
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    input.files = transfer.files;
+  } catch (error) {
+    input.value = "";
+  }
+}
+
+function getSelectedImage(inputId, storageKey, fallbackName) {
+  const input = document.getElementById(inputId);
+
+  if (input && input.files && input.files[0]) {
+    return {
+      source: URL.createObjectURL(input.files[0]),
+      revoke: true,
+    };
+  }
+
+  const imageData = localStorage.getItem(storageKey);
+  if (!imageData) return null;
+
+  try {
+    const file = imageDataToFile(imageData, fallbackName);
+    assignInputFile(input, file);
+  } catch (error) {
+    localStorage.removeItem(storageKey);
+    return null;
+  }
+
+  return {
+    source: imageData,
+    revoke: false,
+  };
+}
+
+function loadImage(source, onLoad, onError) {
+  const img = new Image();
+
+  img.onload = function () {
+    onLoad(img);
+  };
+
+  img.onerror = function () {
+    if (source.revoke) URL.revokeObjectURL(source.source);
+    onError();
+  };
+
+  img.src = source.source;
+}
+
 function showAlert(message) {
   window.alert(message);
 }
@@ -60,7 +128,11 @@ function setupDropZone(dropZoneId, inputId, fileNameId, previewId, previewImgId,
     zone.classList.remove("drop-active");
     const files = event.dataTransfer.files;
     if (files && files.length) {
-      input.files = files;
+      try {
+        input.files = files;
+      } catch (error) {
+        assignInputFile(input, files[0]);
+      }
       updateFileLabel(files);
     }
   });
@@ -94,30 +166,41 @@ function deleteImagePreview(inputId, previewImgId, deleteButtonId, previewId, pl
   const placeholder = document.getElementById(placeholderId);
   const fileName = document.getElementById(fileNameId);
   
-  input.value = "";
-  previewImg.src = "";
-  previewImg.classList.add("hidden");
-  deleteBtn.classList.add("hidden");
+  if (input) input.value = "";
+  if (previewImg) {
+    previewImg.src = "";
+    previewImg.classList.add("hidden");
+  }
+  if (deleteBtn) deleteBtn.classList.add("hidden");
   if (placeholder) placeholder.classList.remove("hidden");
   if (fileName) fileName.textContent = "Belum ada file dipilih";
+  if (preview) preview.classList.add("hidden");
   
   // Remove from localStorage
   localStorage.removeItem(storageKey);
 }
 
-function loadImageFromStorage(previewImgId, previewContainerId, placeholderId, deleteButtonId, storageKey) {
+function loadImageFromStorage(previewImgId, previewContainerId, placeholderId, deleteButtonId, storageKey, inputId, fileNameId) {
   const imageData = localStorage.getItem(storageKey);
   if (imageData) {
     const previewImg = document.getElementById(previewImgId);
     const previewContainer = document.getElementById(previewContainerId);
     const placeholder = document.getElementById(placeholderId);
     const deleteBtn = document.getElementById(deleteButtonId);
+    const input = document.getElementById(inputId);
+    const fileName = document.getElementById(fileNameId);
     
     if (previewImg && previewContainer) {
       previewImg.src = imageData;
       previewImg.classList.remove("hidden");
       if (placeholder) placeholder.classList.add("hidden");
       if (deleteBtn) deleteBtn.classList.remove("hidden");
+      if (fileName) fileName.textContent = "Gambar tersimpan dari sesi sebelumnya";
+      try {
+        assignInputFile(input, imageDataToFile(imageData, "stegasecure-saved.png"));
+      } catch (error) {
+        localStorage.removeItem(storageKey);
+      }
       previewContainer.classList.remove("hidden");
     }
   }
@@ -128,20 +211,22 @@ function initDragAndDrop() {
   setupDropZone("decodeDropZone", "decodeImage", "decodeFileName", "decodePreview", "decodePreviewImg", "decodePreviewPlaceholder", "decodeDeleteBtn", "decodeImageData");
   
   // Load images from localStorage
-  loadImageFromStorage("encodePreviewImg", "encodePreview", "encodePreviewPlaceholder", "encodeDeleteBtn", "encodeImageData");
-  loadImageFromStorage("decodePreviewImg", "decodePreview", "decodePreviewPlaceholder", "decodeDeleteBtn", "decodeImageData");
+  loadImageFromStorage("encodePreviewImg", "encodePreview", "encodePreviewPlaceholder", "encodeDeleteBtn", "encodeImageData", "encodeImage", "encodeFileName");
+  loadImageFromStorage("decodePreviewImg", "decodePreview", "decodePreviewPlaceholder", "decodeDeleteBtn", "decodeImageData", "decodeImage", "decodeFileName");
   
   // Setup delete buttons
   const encodeDeleteBtn = document.getElementById("encodeDeleteBtn");
   if (encodeDeleteBtn) {
-    encodeDeleteBtn.addEventListener("click", () => {
+    encodeDeleteBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
       deleteImagePreview("encodeImage", "encodePreviewImg", "encodeDeleteBtn", "encodePreview", "encodePreviewPlaceholder", "encodeFileName", "encodeImageData");
     });
   }
   
   const decodeDeleteBtn = document.getElementById("decodeDeleteBtn");
   if (decodeDeleteBtn) {
-    decodeDeleteBtn.addEventListener("click", () => {
+    decodeDeleteBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
       deleteImagePreview("decodeImage", "decodePreviewImg", "decodeDeleteBtn", "decodePreview", "decodePreviewPlaceholder", "decodeFileName", "decodeImageData");
     });
   }
@@ -150,21 +235,24 @@ function initDragAndDrop() {
 document.addEventListener("DOMContentLoaded", initDragAndDrop);
 
 function encodeMessage() {
-  const imageInput = document.getElementById("encodeImage");
   const message = document.getElementById("secretMessage").value.trim();
   const password = document.getElementById("encodePassword").value.trim();
+  const imageSource = getSelectedImage("encodeImage", "encodeImageData", "encode-source.png");
 
-  if (!imageInput.files[0] || !message || !password) {
+  if (!imageSource || !message || !password) {
     showAlert("Lengkapi semua input!");
+    return;
+  }
+
+  if (typeof CryptoJS === "undefined") {
+    showAlert("Library enkripsi belum termuat. Periksa koneksi internet lalu coba lagi.");
     return;
   }
 
   const encrypted = CryptoJS.AES.encrypt(message, password).toString();
   const binaryMessage = textToBinary(encrypted + "\0");
 
-  const img = new Image();
-  img.src = URL.createObjectURL(imageInput.files[0]);
-  img.onload = function () {
+  loadImage(imageSource, (img) => {
     const canvas = document.getElementById("encodeCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -178,7 +266,7 @@ function encodeMessage() {
 
     if (binaryMessage.length > maxBits) {
       showAlert("Pesan terlalu panjang untuk gambar ini!");
-      URL.revokeObjectURL(img.src);
+      if (imageSource.revoke) URL.revokeObjectURL(imageSource.source);
       return;
     }
 
@@ -193,7 +281,7 @@ function encodeMessage() {
     canvas.toBlob((blob) => {
       if (!blob) {
         showAlert("Gagal membuat gambar stego.");
-        URL.revokeObjectURL(img.src);
+        if (imageSource.revoke) URL.revokeObjectURL(imageSource.source);
         return;
       }
 
@@ -202,28 +290,29 @@ function encodeMessage() {
       link.href = URL.createObjectURL(blob);
       link.click();
       URL.revokeObjectURL(link.href);
-      URL.revokeObjectURL(img.src);
+      if (imageSource.revoke) URL.revokeObjectURL(imageSource.source);
       showAlert("Pesan berhasil disisipkan!");
     }, "image/png");
-  };
-
-  img.onerror = function () {
+  }, () => {
     showAlert("Gagal memuat gambar. Pastikan file gambar valid.");
-  };
+  });
 }
 
 function decodeMessage() {
-  const imageInput = document.getElementById("decodeImage");
   const password = document.getElementById("decodePassword").value.trim();
+  const imageSource = getSelectedImage("decodeImage", "decodeImageData", "decode-source.png");
 
-  if (!imageInput.files[0] || !password) {
+  if (!imageSource || !password) {
     showAlert("Lengkapi semua input!");
     return;
   }
 
-  const img = new Image();
-  img.src = URL.createObjectURL(imageInput.files[0]);
-  img.onload = function () {
+  if (typeof CryptoJS === "undefined") {
+    showAlert("Library enkripsi belum termuat. Periksa koneksi internet lalu coba lagi.");
+    return;
+  }
+
+  loadImage(imageSource, (img) => {
     const canvas = document.getElementById("decodeCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -234,15 +323,22 @@ function decodeMessage() {
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const pixels = imageData.data;
     let binary = "";
+    let extractedText = "";
 
     for (let i = 0; i < pixels.length; i += 4) {
       binary += pixels[i] & 1;
+
+      if (binary.length === 8) {
+        const charCode = parseInt(binary, 2);
+        if (charCode === 0) break;
+        extractedText += String.fromCharCode(charCode);
+        binary = "";
+      }
     }
 
-    const extractedText = binaryToText(binary);
     if (!extractedText) {
       showAlert("Tidak ada pesan yang ditemukan di gambar ini.");
-      URL.revokeObjectURL(img.src);
+      if (imageSource.revoke) URL.revokeObjectURL(imageSource.source);
       return;
     }
 
@@ -257,13 +353,11 @@ function decodeMessage() {
     } catch (error) {
       showAlert("Password salah atau data rusak!");
     } finally {
-      URL.revokeObjectURL(img.src);
+      if (imageSource.revoke) URL.revokeObjectURL(imageSource.source);
     }
-  };
-
-  img.onerror = function () {
+  }, () => {
     showAlert("Gagal memuat gambar. Pastikan file gambar valid.");
-  };
+  });
 }
 
 function initScrollReveal() {

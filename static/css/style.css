@@ -656,3 +656,127 @@ footer {
   display: none !important;
 }
 
+/* Mobile and accessibility polish */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  line-height: 1.5;
+}
+
+.p-6 {
+  padding: clamp(1rem, 4vw, 1.5rem);
+}
+
+.grid,
+.drop-content,
+.card-glow,
+.bg-slate-900\/70 {
+  min-width: 0;
+}
+
+.rounded-3xl,
+.rounded-xl,
+.file-drop-zone,
+.image-preview,
+.image-preview img,
+.preview-placeholder,
+button,
+.btn {
+  border-radius: 0.5rem;
+}
+
+.text-5xl {
+  font-size: clamp(2.15rem, 11vw, 4rem);
+}
+
+.badge-row,
+.drop-content {
+  max-width: 100%;
+}
+
+.badge {
+  min-height: 2.25rem;
+  text-align: center;
+}
+
+.drop-filename {
+  overflow-wrap: anywhere;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+input,
+textarea {
+  min-width: 0;
+  color: #f8fafc;
+  outline: none;
+  font-size: 1rem;
+}
+
+input:focus,
+textarea:focus,
+.file-drop-zone:focus-within {
+  border-color: rgba(56, 189, 248, 0.85);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+}
+
+button,
+.btn {
+  min-height: 44px;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.image-preview.hidden {
+  display: none;
+}
+
+.delete-preview-btn {
+  width: 2rem;
+  height: 2rem;
+}
+
+@media (max-width: 768px) {
+  .mb-10 {
+    margin-bottom: 1.5rem;
+  }
+
+  .card-glow,
+  .bg-slate-900\/70 {
+    backdrop-filter: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .text-lg {
+    font-size: 1rem;
+  }
+
+  .image-preview,
+  .preview-placeholder,
+  .file-drop-zone {
+    min-height: 180px;
+  }
+
+  .image-preview img {
+    max-height: 220px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
