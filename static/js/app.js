@@ -232,7 +232,16 @@ function initDragAndDrop() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", initDragAndDrop);
+function initPageEntrance() {
+  requestAnimationFrame(() => {
+    document.body.classList.add("page-ready");
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initPageEntrance();
+  initDragAndDrop();
+});
 
 function encodeMessage() {
   const message = document.getElementById("secretMessage").value.trim();

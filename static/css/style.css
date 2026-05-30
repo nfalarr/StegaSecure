@@ -32,6 +32,25 @@ body::before {
   opacity: 0.9;
 }
 
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.72)),
+    radial-gradient(circle at 50% 42%, rgba(34, 211, 238, 0.24), transparent 34%);
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+body.page-ready::after {
+  opacity: 0;
+  transform: scale(1.08);
+}
+
 .min-h-screen {
   min-height: 100vh;
 }
@@ -81,12 +100,12 @@ body::before {
 }
 
 .gradient-text {
-  background: linear-gradient(90deg, #7dd3fc, #a78bfa, #f472b6);
+  background: linear-gradient(90deg, #22d3ee, #818cf8, #f472b6, #34d399, #22d3ee);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
-  background-size: auto;
+  background-size: 300% 100%;
 }
 
 .shimmer-text {
@@ -94,7 +113,7 @@ body::before {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
-  animation: gradientShift 6s ease-in-out infinite;
+  animation: gradientFlow 4s ease-in-out infinite, gradientGlow 2.8s ease-in-out infinite;
 }
 
 @keyframes shimmer {
@@ -457,12 +476,39 @@ footer {
 }
 
 .fade-in {
-  animation: fadeInUp 0.8s ease-out;
+  opacity: 0;
+  transform: translateY(24px) scale(0.98);
+}
+
+.page-ready .fade-in {
+  animation: pageEnter 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards;
+}
+
+.fade-in .text-slate-300,
+.fade-in .badge {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.page-ready .fade-in .text-slate-300 {
+  animation: pageEnterSoft 0.7s ease 0.38s forwards;
+}
+
+.page-ready .fade-in .badge {
+  animation: pageEnterSoft 0.7s ease 0.52s forwards;
+}
+
+.page-ready .fade-in .badge:nth-child(2) {
+  animation-delay: 0.64s;
 }
 
 .scroll-reveal {
   opacity: 0;
-  animation: revealScroll 0.8s ease-out forwards;
+  transform: translateY(52px) scale(0.96);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.85s ease;
+  will-change: opacity, transform;
 }
 
 @keyframes fadeInUp {
@@ -487,20 +533,21 @@ footer {
   }
 }
 
-.scroll-reveal:nth-child(1) {
-  animation-delay: 0.1s;
-}
-
-.scroll-reveal:nth-child(2) {
-  animation-delay: 0.3s;
-}
-
-.scroll-reveal:nth-child(3) {
-  animation-delay: 0.5s;
-}
-
 .scroll-reveal.revealed {
-  animation-play-state: running !important;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.scroll-reveal.revealed:nth-child(1) {
+  transition-delay: 0.08s;
+}
+
+.scroll-reveal.revealed:nth-child(2) {
+  transition-delay: 0.18s;
+}
+
+.scroll-reveal.revealed:nth-child(3) {
+  transition-delay: 0.28s;
 }
 
 /* Image Preview Styles */
@@ -777,6 +824,61 @@ button,
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .fade-in,
+  .scroll-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  body::after {
+    display: none;
+  }
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes pageEnterSoft {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes gradientGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 0 rgba(34, 211, 238, 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.36));
   }
 }
 
