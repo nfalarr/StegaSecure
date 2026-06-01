@@ -12,13 +12,6 @@ Aplikasi web statis untuk menyembunyikan pesan pada gambar menggunakan metode LS
 * Berjalan sepenuhnya di browser tanpa memerlukan server atau database.
 * Dibangun menggunakan HTML, CSS, dan JavaScript.
 
-## Cara Menjalankan
-
-1. Clone atau download repository ini.
-2. Buka file `index.html` di browser.
-
-Atau jalankan server lokal sederhana seperti **Live Server** di VS Code.
-
 ## Penggunaan
 
 ### Menyisipkan Pesan
