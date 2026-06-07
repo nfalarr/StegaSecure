@@ -1,5 +1,12 @@
 # StegaSecure 🔒
 
+[![status](https://img.shields.io/badge/status-active%20development-brightgreen)](https://github.com/nfalarr/StegaSecure)
+[![demo](https://img.shields.io/badge/demo-Netlify-00C7B7?logo=netlify&logoColor=white)](https://stegasecure.netlify.app)
+[![language](https://img.shields.io/badge/language-JavaScript-F7DF1E?logo=javascript&logoColor=black)](https://github.com/nfalarr/StegaSecure)
+[![branch](https://img.shields.io/badge/branch-main-blue?logo=github)](https://github.com/nfalarr/StegaSecure/tree/main)
+[![repository](https://img.shields.io/badge/repository-public-blue?logo=github)](https://github.com/nfalarr/StegaSecure)
+[![stars](https://img.shields.io/github/stars/nfalarr/StegaSecure?style=flat&logo=github)](https://github.com/nfalarr/StegaSecure/stargazers)
+
 Aplikasi web statis untuk menyembunyikan pesan pada gambar menggunakan metode LSB dan AES.
 
 🌐 **Demo Aplikasi:** https://stegasecure.netlify.app
