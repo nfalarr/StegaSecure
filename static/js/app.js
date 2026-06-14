@@ -89,6 +89,13 @@ function showAlert(message) {
   window.alert(message);
 }
 
+function fitDropZoneToImage(previewImg, previewContainer) {
+  const zone = previewContainer.closest(".file-drop-zone");
+  if (!zone || !previewImg.naturalWidth || !previewImg.naturalHeight) return;
+
+  zone.style.setProperty("--preview-aspect-ratio", `${previewImg.naturalWidth} / ${previewImg.naturalHeight}`);
+}
+
 function setupDropZone(dropZoneId, inputId, fileNameId, previewId, previewImgId, placeholderId, deleteButtonId, storageKey) {
   const zone = document.getElementById(dropZoneId);
   const input = document.getElementById(inputId);
@@ -105,6 +112,7 @@ function setupDropZone(dropZoneId, inputId, fileNameId, previewId, previewImgId,
     } else {
       fileName.textContent = "Belum ada file dipilih";
       if (preview) preview.classList.add("hidden");
+      zone.classList.remove("has-image");
     }
   }
 
@@ -146,11 +154,14 @@ function showImagePreview(file, previewImg, previewContainer, placeholderId, del
   const reader = new FileReader();
   reader.onload = (e) => {
     const imageData = e.target.result;
+    previewImg.onload = () => fitDropZoneToImage(previewImg, previewContainer);
     previewImg.src = imageData;
     previewImg.classList.remove("hidden");
     if (placeholder) placeholder.classList.add("hidden");
     if (deleteBtn) deleteBtn.classList.remove("hidden");
     previewContainer.classList.remove("hidden");
+    const zone = previewContainer.closest(".file-drop-zone");
+    if (zone) zone.classList.add("has-image");
     
     // Save to localStorage
     localStorage.setItem(storageKey, imageData);
@@ -175,6 +186,11 @@ function deleteImagePreview(inputId, previewImgId, deleteButtonId, previewId, pl
   if (placeholder) placeholder.classList.remove("hidden");
   if (fileName) fileName.textContent = "Belum ada file dipilih";
   if (preview) preview.classList.add("hidden");
+  const zone = preview ? preview.closest(".file-drop-zone") : null;
+  if (zone) {
+    zone.classList.remove("has-image");
+    zone.style.removeProperty("--preview-aspect-ratio");
+  }
   
   // Remove from localStorage
   localStorage.removeItem(storageKey);
@@ -191,6 +207,7 @@ function loadImageFromStorage(previewImgId, previewContainerId, placeholderId, d
     const fileName = document.getElementById(fileNameId);
     
     if (previewImg && previewContainer) {
+      previewImg.onload = () => fitDropZoneToImage(previewImg, previewContainer);
       previewImg.src = imageData;
       previewImg.classList.remove("hidden");
       if (placeholder) placeholder.classList.add("hidden");
@@ -202,6 +219,8 @@ function loadImageFromStorage(previewImgId, previewContainerId, placeholderId, d
         localStorage.removeItem(storageKey);
       }
       previewContainer.classList.remove("hidden");
+      const zone = previewContainer.closest(".file-drop-zone");
+      if (zone) zone.classList.add("has-image");
     }
   }
 }

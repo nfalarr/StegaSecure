@@ -305,6 +305,7 @@ body.page-ready::after {
   padding: 1.5rem;
   cursor: pointer;
   transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+  overflow: hidden;
 }
 
 .file-drop-zone:hover {
@@ -314,6 +315,18 @@ body.page-ready::after {
 .file-drop-zone.drop-active {
   border-color: #38bdf8;
   background: rgba(56, 189, 248, 0.12);
+}
+
+.file-drop-zone.has-image {
+  border-style: solid;
+  padding: 0;
+  aspect-ratio: var(--preview-aspect-ratio, 16 / 9);
+  min-height: 240px;
+  max-height: 520px;
+}
+
+.file-drop-zone.has-image .drop-content {
+  visibility: hidden;
 }
 
 .drop-content {
@@ -555,22 +568,21 @@ footer {
 /* Image Preview Styles */
 .image-preview {
   display: block;
-  border: 1px solid rgba(96, 165, 250, 0.24);
-  border-radius: 1rem;
-  padding: 1rem;
-  background: rgba(15, 23, 42, 0.5);
+  position: absolute;
+  inset: 0;
+  padding: 0.75rem;
+  background: rgba(15, 23, 42, 0.72);
   animation: previewFadeIn 0.5s ease-out;
-  position: relative;
-  min-height: 300px;
 }
 
 .image-preview img {
-  max-height: 280px;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
+  max-height: 100%;
   object-fit: contain;
-  border-radius: 0.75rem;
   display: block;
+  border-radius: 0.5rem;
 }
 
 @keyframes previewFadeIn {
@@ -667,6 +679,15 @@ footer {
 /* Preview Image Wrapper */
 .preview-image-wrapper {
   position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-drop-zone .image-preview img {
+  max-height: 100%;
 }
 
 .delete-preview-btn {
@@ -831,6 +852,11 @@ button,
   .preview-placeholder,
   .file-drop-zone {
     min-height: 180px;
+  }
+
+  .file-drop-zone.has-image {
+    min-height: 220px;
+    max-height: 420px;
   }
 
   .image-preview img {
